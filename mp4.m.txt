@@ -1,0 +1,20 @@
+% read wav file and convert it to 1 chanel, plot the waveform
+[y,fs] = audioread('shuo_speech2.wav');
+y = y(:,1);
+dt = 1/fs;
+t = 0:dt:(length(y)*dt)-dt;
+plot(t,y); xlabel('Seconds'); ylabel('Amplitude')
+
+%get the autocorrelation matrix p*p
+[X,R] = corrmtx(y,12)
+
+[a,g] = lpc(y,3)
+est_y = filter([0 -a(2:end)],1,y);
+e = y-est_y;
+[acs,lags] = xcorr(e,'coeff');
+
+plot(1:10000,y(1:10000),1:10000,est_y(1:10000),'--'), grid
+%plot(y,est_y,'--'), grid
+title 'Original Signal vs. LPC Estimate'
+xlabel 'Sample number', ylabel 'Amplitude'
+legend('Original signal','LPC estimate')
